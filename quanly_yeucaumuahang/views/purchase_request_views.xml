@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- TREE VIEW -->
+    <record id="view_purchase_request_tree" model="ir.ui.view">
+        <field name="name">purchase.request.tree</field>
+        <field name="model">purchase.request</field>
+        <field name="arch" type="xml">
+            <tree string="Yêu cầu mua hàng">
+                <field name="name"/>
+                <field name="department_id"/>
+                <field name="request_id"/>
+                <field name="approver_id"/>
+                <field name="date"/>
+                <field name="date_approve"/>
+                <field name="state"/>
+                <field name="total_qty"/>
+                <field name="total_amount"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- FORM VIEW -->
+    <record id="view_purchase_request_form" model="ir.ui.view">
+        <field name="name">purchase.request.form</field>
+        <field name="model">purchase.request</field>
+        <field name="arch" type="xml">
+            <form string="Yêu cầu mua hàng">
+
+                <header>
+                    <button name="action_submit"
+                            string="Yêu cầu phê duyệt"
+                            type="object"
+                            class="oe_highlight"
+                            states="draft"/>
+
+                    <button name="action_back_to_draft"
+                            string="Quay lại dự thảo"
+                            type="object"
+                            states="wait"/>
+
+                    <button name="action_approve"
+                            string="Phê duyệt"
+                            type="object"
+                            class="oe_highlight"
+                            states="wait"/>
+
+                    <button name="action_cancel"
+                            string="Từ chối"
+                            type="object"
+                            states="wait"/>
+
+                    <button name="action_export_excel"
+                            string="Xuất Excel"
+                            type="object"
+                            class="oe_highlight"
+                            states="approved"/>
+
+                    <field name="state"
+                           widget="statusbar"
+                           statusbar_visible="draft,wait,approved,cancel"/>
+                </header>
+
+                <sheet>
+
+                    <!-- TIÊU ĐỀ MÃ YÊU CẦU -->
+                    <div class="oe_title">
+                        <label for="name" string="Yêu cầu tham chiếu"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <!-- THÔNG TIN CHÍNH -->
+                    <group>
+                        <group>
+                            <field name="request_id"
+                                   string="Được yêu cầu bởi"
+                                   required="1"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+
+                            <field name="approver_id"
+                                   string="Người phê duyệt"
+                                   required="1"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+
+                            <field name="department_id"
+                                   string="Phòng ban"
+                                   required="1"
+                                   options="{'no_create': True, 'no_create_edit': True}"/>
+                        </group>
+
+                        <group>
+                            <field name="date"
+                                   string="Ngày tạo"
+                                   required="1"/>
+
+                            <field name="date_approve"
+                                   string="Ngày phê duyệt"
+                                   readonly="1"/>
+
+                            <field name="total_qty"
+                                   string="Tổng số lượng"
+                                   readonly="1"/>
+
+                            <field name="total_amount"
+                                   string="Tổng tiền"
+                                   readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+
+                        <!-- TAB SẢN PHẨM -->
+                        <page string="Sản phẩm">
+                            <field name="request_line_ids">
+                                <tree editable="bottom">
+                                    <field name="state" invisible="1"/>
+
+                                    <field name="product_id"
+                                           string="Sản phẩm"
+                                           required="1"
+                                           options="{'no_create': True, 'no_create_edit': True}"
+                                           attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+
+                                    <field name="uom_id"
+                                           string="Đơn vị tính"
+                                           required="1"
+                                           options="{'no_create': True, 'no_create_edit': True}"
+                                           attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+
+                                    <field name="qty"
+                                           string="Số lượng"
+                                           attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+
+                                    <field name="qty_approve"
+                                           string="Số lượng phê duyệt"
+                                           attrs="{'readonly': [('state', '!=', 'wait')]}"/>
+
+                                    <field name="price_unit"
+                                           string="Đơn giá"
+                                           attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+
+                                    <field name="total"
+                                           string="Thành tiền"
+                                           readonly="1"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                        <!-- TAB MÔ TẢ -->
+                        <page string="Mô tả">
+                            <group>
+                                <field name="description"
+                                       string="Mô tả"
+                                       placeholder="Nhập mô tả yêu cầu mua hàng..."/>
+
+                                <field name="reject_reason"
+                                       string="Lý do từ chối"
+                                       readonly="1"
+                                       attrs="{'invisible': [('state', '!=', 'cancel')]}"/>
+                            </group>
+                        </page>
+
+                    </notebook>
+
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+ <!-- Search view yêu cầu mua hàng -->
+<record id="view_purchase_request_search" model="ir.ui.view">
+    <field name="name">purchase.request.search</field>
+    <field name="model">purchase.request</field>
+    <field name="arch" type="xml">
+        <search string="Tìm kiếm yêu cầu mua hàng">
+            <field name="name"/>
+            <field name="request_id"/>
+            <field name="approver_id"/>
+            <field name="department_id"/>
+            <field name="state"/>
+
+            <filter string="Dự thảo" name="filter_draft" domain="[('state','=','draft')]"/>
+            <filter string="Chờ phê duyệt" name="filter_wait" domain="[('state','=','wait')]"/>
+            <filter string="Đã phê duyệt" name="filter_approved" domain="[('state','=','approved')]"/>
+            <filter string="Đã hủy" name="filter_cancel" domain="[('state','=','cancel')]"/>
+
+            <group expand="0" string="Nhóm theo">
+                <filter string="Phòng ban" name="group_department" context="{'group_by':'department_id'}"/>
+                <filter string="Người yêu cầu" name="group_requester" context="{'group_by':'request_id'}"/>
+                <filter string="Người phê duyệt" name="group_approver" context="{'group_by':'approver_id'}"/>
+                <filter string="Trạng thái" name="group_state" context="{'group_by':'state'}"/>
+            </group>
+        </search>
+    </field>
+</record>
+    <!-- ACTION -->
+    <record id="action_purchase_request" model="ir.actions.act_window">
+    <field name="name">Yêu cầu mua hàng</field>
+    <field name="res_model">purchase.request</field>
+    <field name="view_mode">tree,form</field>
+    <field name="search_view_id" ref="view_purchase_request_search"/>
+</record>
+
+</odoo>
